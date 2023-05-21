@@ -12,7 +12,7 @@ function getEle(id) {
   return document.getElementById(id);
 }
 
-// Tạo hàm getInfoNV
+/* Tạo hàm getInfoNV */
 function getInfoNV(isAdd) {
   var taiKhoan = getEle("tknv").value;
   var hoTen = getEle("name").value;
@@ -26,6 +26,7 @@ function getInfoNV(isAdd) {
   /* Validation */
   var isValid = true;
 
+  // nếu cập nhật thì bỏ qua validation tài khoản
   if (isAdd) {
     // Validation tài khoản
     isValid &=
@@ -121,6 +122,7 @@ function getInfoNV(isAdd) {
       200,
     );
 
+  // nếu isValid là false thì dừng lại
   if (!isValid) return null;
 
   //   Tạo đối tượng nhanVien từ lớp đối tượng NhanVien
@@ -140,7 +142,7 @@ function getInfoNV(isAdd) {
   return nhanVien;
 }
 
-// Tạo hàm renderTable
+/* Tạo hàm renderTable */
 function renderTable(data) {
   var content = "";
 
@@ -163,10 +165,11 @@ function renderTable(data) {
         `;
   }
 
+  // hiển thị ra giao diện
   getEle("tableDanhSach").innerHTML = content;
 }
 
-// Tạo hàm set localStorage
+/* Tạo hàm set localStorage */
 function setLocalStorage() {
   // convert json to string
   var dataString = JSON.stringify(dsnv.arr);
@@ -174,7 +177,7 @@ function setLocalStorage() {
   localStorage.setItem("DSNV", dataString);
 }
 
-// Tạo hàm get localStorage
+/* Tạo hàm get localStorage */
 function getLocalStorage() {
   // check condition
   if (localStorage.getItem("DSNV")) {
@@ -189,7 +192,7 @@ function getLocalStorage() {
   }
 }
 
-// Tạo hàm xóa nhân viên
+/* Tạo hàm xóa nhân viên */
 function deleteNV(tk) {
   dsnv.delNV(tk);
 
@@ -200,12 +203,15 @@ function deleteNV(tk) {
   setLocalStorage();
 }
 
-// Tạo hàm sửa nhân viên
+/* Tạo hàm sửa nhân viên */
 function editNV(tk) {
+  // lấy thông tin nhân viên cần sửa
   var nvEdit = dsnv.getInfo(tk);
+
+  // nếu dữ liệu đúng thì hiển thị thông tin lên các thẻ input
   if (nvEdit) {
     getEle("tknv").value = nvEdit.taiKhoan;
-    getEle("tknv").disabled = true;
+    getEle("tknv").disabled = true; // tài khoản không thể sửa
     getEle("name").value = nvEdit.hoTen;
     getEle("email").value = nvEdit.email;
     getEle("password").value = nvEdit.matKhau;
@@ -215,13 +221,14 @@ function editNV(tk) {
     getEle("gioLam").value = nvEdit.gioLam;
   }
 
-  // khi nhấn sửa ta sẽ ẩn nút thêm, mà hiện nút cập nhật
+  // khi sửa ta sẽ ẩn nút thêm, mà hiện nút cập nhật
   getEle("btnThemNV").disabled = true;
   getEle("btnCapNhat").disabled = false;
 }
 
 // Tạo sự kiện khi click vào nút thêm NV
 getEle("btnThemNV").onclick = function () {
+  // lấy thông tin nhân viên
   var nhanVien = getInfoNV(true);
 
   //   Đưa đối tượng nhanVien vào mảng dsnv
@@ -234,7 +241,7 @@ getEle("btnThemNV").onclick = function () {
   setLocalStorage();
 };
 
-// Tạo sự kiện khi click vào nút cập nhập NV
+/* Tạo sự kiện khi click vào nút cập nhập NV */
 getEle("btnCapNhat").onclick = function () {
   var nhanVien = getInfoNV(false);
 
@@ -248,6 +255,7 @@ getEle("btnCapNhat").onclick = function () {
   setLocalStorage();
 };
 
+/* Sự kiện click vào nút Reset */
 getEle("btnReset").onclick = function () {
   getEle("tknv").value = "";
   getEle("tknv").disabled = false;
@@ -265,3 +273,16 @@ getEle("btnThem").onclick = function () {
   getEle("btnThemNV").disabled = false;
   getEle("btnCapNhat").disabled = true;
 };
+
+/* Tìm kiếm NV theo xếp loại */
+// sự kiện keyup khi gõ vào thanh tìm kiếm
+getEle("searchName").addEventListener("keyup", function () {
+  // lấy giá trị
+  var keyword = getEle("searchName").value;
+
+  // đưa kết quả tìm kiếm vào mảng
+  var searchArr = dsnv.searchNV(keyword);
+
+  // hiển thị kết quả
+  renderTable(searchArr);
+});
