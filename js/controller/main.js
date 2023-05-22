@@ -14,6 +14,7 @@ function getEle(id) {
 
 /* Tạo hàm getInfoNV */
 function getInfoNV(isAdd) {
+  // lấy thông tin từ user
   var taiKhoan = getEle("tknv").value;
   var hoTen = getEle("name").value;
   var email = getEle("email").value;
@@ -26,7 +27,7 @@ function getInfoNV(isAdd) {
   /* Validation */
   var isValid = true;
 
-  // nếu cập nhật thì bỏ qua validation tài khoản
+  // nếu cập nhật NV thì bỏ qua validation tài khoản
   if (isAdd) {
     // Validation tài khoản
     isValid &=
@@ -58,7 +59,11 @@ function getInfoNV(isAdd) {
   // validation email
   isValid &=
     validation.checkEmpty(email, "tbEmail", "(*) Email không để trống") &&
-    validation.checkEmail(email, "tbEmail", "(*) Vui lòng nhập đúng email");
+    validation.checkEmail(
+      email,
+      "tbEmail",
+      "(*) Vui lòng nhập đúng định dạng email",
+    );
 
   // validation mật khẩu
   isValid &=
@@ -70,14 +75,14 @@ function getInfoNV(isAdd) {
     validation.checkLength(
       matKhau,
       "tbMatKhau",
-      "Mật khẩu phải từ 6 đến 10 ký tự",
+      "(*) Mật khẩu phải từ 6 đến 10 ký tự",
       6,
       10,
     ) &&
     validation.checkPass(
       matKhau,
       "tbMatKhau",
-      "Vui lòng chứa ít nhất 1 ký tự số, 1 ký tự in hoa, 1 ký tự đặc biệt",
+      "(*) Vui lòng chứa ít nhất 1 ký tự số, 1 ký tự in hoa, 1 ký tự đặc biệt",
     );
 
   // validation ngày làm
@@ -86,7 +91,7 @@ function getInfoNV(isAdd) {
     validation.checkDate(
       ngayLam,
       "tbNgay",
-      "Vui lòng nhập định dạng mm/dd/yyyy",
+      "(*) Vui lòng nhập định dạng mm/dd/yyyy",
     );
 
   // validation lương cơ bản
@@ -99,7 +104,7 @@ function getInfoNV(isAdd) {
     validation.checkValue(
       luongCB,
       "tbLuongCB",
-      "Lương cơ bản từ 1.000.000 đến 20.000.000",
+      "(*) Lương cơ bản từ 1.000.000 đến 20.000.000",
       1000000,
       20000000,
     );
@@ -117,7 +122,7 @@ function getInfoNV(isAdd) {
     validation.checkValue(
       gioLam,
       "tbGiolam",
-      "Số giờ làm trong tháng phải từ 80 đến 200 giờ",
+      "(*) Số giờ làm trong tháng phải từ 80 đến 200 giờ",
       80,
       200,
     );
@@ -229,21 +234,24 @@ function editNV(tk) {
 // Tạo sự kiện khi click vào nút thêm NV
 getEle("btnThemNV").onclick = function () {
   // lấy thông tin nhân viên
-  var nhanVien = getInfoNV(true);
+  var nhanVien = getInfoNV(true); //tham số true để validate taiKhoan
 
-  //   Đưa đối tượng nhanVien vào mảng dsnv
-  dsnv.addNV(nhanVien);
+  if (nhanVien) {
+    // nhanVien phải khác null
+    //   Đưa đối tượng nhanVien vào mảng dsnv
+    dsnv.addNV(nhanVien);
 
-  //   Hiện thị danh sách nhân viên ra giao diện
-  renderTable(dsnv.arr);
+    //   Hiện thị danh sách nhân viên ra giao diện
+    renderTable(dsnv.arr);
 
-  // lưu vào local storage
-  setLocalStorage();
+    // lưu vào local storage
+    setLocalStorage();
+  }
 };
 
 /* Tạo sự kiện khi click vào nút cập nhập NV */
 getEle("btnCapNhat").onclick = function () {
-  var nhanVien = getInfoNV(false);
+  var nhanVien = getInfoNV(false); //tham số false để bỏ qua validate taiKhoan khi cập nhật
 
   // cập nhật đối tượng nhanVien vào mảng dsnv.arr
   dsnv.updateNV(nhanVien);
@@ -257,6 +265,7 @@ getEle("btnCapNhat").onclick = function () {
 
 /* Sự kiện click vào nút Reset */
 getEle("btnReset").onclick = function () {
+  // reset dữ liệu
   getEle("tknv").value = "";
   getEle("tknv").disabled = false;
   getEle("name").value = "";
@@ -268,7 +277,7 @@ getEle("btnReset").onclick = function () {
   getEle("gioLam").value = "";
 };
 
-// khi ấn thêm ta sẽ ẩn nút cập nhật và hiện nút thêm NV
+/* khi click button#btnThem ta sẽ ẩn nút cập nhật và hiện nút thêm NV */
 getEle("btnThem").onclick = function () {
   getEle("btnThemNV").disabled = false;
   getEle("btnCapNhat").disabled = true;
@@ -277,7 +286,7 @@ getEle("btnThem").onclick = function () {
 /* Tìm kiếm NV theo xếp loại */
 // sự kiện keyup khi gõ vào thanh tìm kiếm
 getEle("searchName").addEventListener("keyup", function () {
-  // lấy giá trị
+  // lấy từ khóa
   var keyword = getEle("searchName").value;
 
   // đưa kết quả tìm kiếm vào mảng

@@ -91,7 +91,7 @@ function Validation() {
     return false;
   };
 
-  //   kiểm tra giá trị
+  //   kiểm tra giá trị nhập
   this.checkValue = function (value, errorID, mess, min, max) {
     if (value >= min && value <= max) {
       getEle(errorID).innerHTML = "";
